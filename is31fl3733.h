@@ -5,11 +5,11 @@
 
 #include <stdint.h>
 
-/** Maximum number of CS lines.
+/** Number of CS lines.
   */
 #define IS31FL3733_CS (16)
 
-/** Maximum number of SW lines.
+/** Number of SW lines.
   */
 #define IS31FL3733_SW (12)
 
@@ -31,57 +31,79 @@
 
 /** IS31FL3733 common registers.
   */
-#define IS31FL3733_CR   (0xFD) ///< Command register.
-#define IS31FL3733_CRWL (0xFE) ///< Command register write lock.
-#define IS31FL3733_IMR  (0xF0) ///< Interrupt mask register.
-#define IS31FL3733_ISR  (0xF1) ///< Interrupt status register.
+#define IS31FL3733_PSR  (0xFD) ///< Page select register. Write only.
+#define IS31FL3733_PSWL (0xFE) ///< Page select register write lock. Read/Write.
+#define IS31FL3733_IMR  (0xF0) ///< Interrupt mask register. Write only.
+#define IS31FL3733_ISR  (0xF1) ///< Interrupt status register. Read only.
 
-#define IS31FL3733_CR_PTR_PG0 (0x00) /// Set CR pointer to Page 0.
-#define IS31FL3733_CR_PTR_PG1 (0x01) /// Set CR pointer to Page 1.
-#define IS31FL3733_CR_PTR_PG2 (0x02) /// Set CR pointer to Page 2.
-#define IS31FL3733_CR_PTR_PG3 (0x03) /// Set CR pointer to Page 3.
+/** Registers in Page 0.
+  */
+#define IS31FL3733_LEDONOFF (0x0000) /// ON or OFF state control for each LED. Write only.
+#define IS31FL3733_LEDOPEN  (0x0018) /// Open state for each LED. Read only.
+#define IS31FL3733_LEDSHORT (0x0030) /// Short state for each LED. Read only.
 
-#define IS31FL3733_CRWL_DISABLE (0x00) /// Disable write to CR.
-#define IS31FL3733_CRWL_ENABLE  (0xC5) /// Enable write to CR.
+/** Registers in Page 1.
+  */
+#define IS31FL3733_LEDPWM (0x0100) /// PWM duty for each LED. Write only.
 
-#define IS31FL3733_IMR_IAC (0x08)
-#define IS31FL3733_IMR_IAB (0x04)
-#define IS31FL3733_IMR_IS  (0x02)
-#define IS31FL3733_IMR_IO  (0x01)
+/** Registers in Page 2.
+  */
+#define IS31FL3733_LEDABM (0x0200) /// Auto breath mode for each LED. Write only.
 
-#define IS31FL3733_ISR_ABM3 (0x10)
-#define IS31FL3733_ISR_ABM2 (0x08)
-#define IS31FL3733_ISR_ABM1 (0x04)
-#define IS31FL3733_ISR_SB   (0x02)
-#define IS31FL3733_ISR_OB   (0x01)
+/** Registers in Page 3.
+  */
+#define IS31FL3733_CR    (0x0300) /// Configuration Register. Write only.
+#define IS31FL3733_GCC   (0x0301) /// Global Current Control register. Write only.
+#define IS31FL3733_ABM1  (0x0302) /// Auto breath control register for ABM-1. Write only.
+#define IS31FL3733_ABM2  (0x0306) /// Auto breath control register for ABM-2. Write only.
+#define IS31FL3733_ABM3  (0x030A) /// Auto breath control register for ABM-3. Write only.
+#define IS31FL3733_TUR   (0x030E) /// Time update register. Write only.
+#define IS31FL3733_SWPUR (0x030F) /// SWy Pull-Up Resistor selection register. Write only.
+#define IS31FL3733_CSPDR (0x0310) /// CSx Pull-Down Resistor selection register. Write only.
+#define IS31FL3733_RESET (0x0311) /// Reset register. Read only.
 
-/// Registers in Page 0.
-#define IS31FL3733_PG0_LEDONOFF (0x00)
-#define IS31FL3733_PG0_LEDOPEN  (0x18)
-#define IS31FL3733_PG0_LEDSHORT (0x30)
+/// Get register page.
+#define IS31FL3733_GET_PAGE(reg_addr) (uint8_t)((reg_addr) >> 8)
+/// Get register 8-bit address.
+#define IS31FL3733_GET_ADDR(reg_addr) (uint8_t)(reg_addr)
 
-/// Registers in Page 1.
-#define IS31FL3733_PG1_PWM (0x00)
+/// PSWL register bits.
+#define IS31FL3733_PSWL_DISABLE (0x00) /// Disable write to Page Select register.
+#define IS31FL3733_PSWL_ENABLE  (0xC5) /// Enable write to Page select register.
 
-/// Registers in Page 2.
-#define IS31FL3733_PG2_ABM (0x00)
+/// IMR register bits.
+#define IS31FL3733_IMR_IAC (0x08) /// Auto Clear Interrupt bit.
+#define IS31FL3733_IMR_IAB (0x04) /// Auto Breath Interrupt bit.
+#define IS31FL3733_IMR_IS  (0x02) /// Dot Short Interrupt bit.
+#define IS31FL3733_IMR_IO  (0x01) /// Dot Open Interrupt bit.
 
-/// Registers in Page 3.
-#define IS31FL3733_PG3_CR    (0x00)
-#define IS31FL3733_PG3_GCC   (0x01)
-#define IS31FL3733_PG3_ABM1  (0x02)
-#define IS31FL3733_PG3_ABM2  (0x06)
-#define IS31FL3733_PG3_ABM3  (0x0A)
-#define IS31FL3733_PG3_TUR   (0x0E)
-#define IS31FL3733_PG3_SWPUR (0x0F)
-#define IS31FL3733_PG3_CSPDR (0x10)
-#define IS31FL3733_PG3_RESET (0x11)
+/// ISR register bits.
+#define IS31FL3733_ISR_ABM3 (0x10) /// Auto Breath Mode 3 Finish Bit.
+#define IS31FL3733_ISR_ABM2 (0x08) /// Auto Breath Mode 2 Finish Bit.
+#define IS31FL3733_ISR_ABM1 (0x04) /// Auto Breath Mode 1 Finish Bit.
+#define IS31FL3733_ISR_SB   (0x02) /// Short Bit.
+#define IS31FL3733_ISR_OB   (0x01) /// Open Bit.
+
+/// ABM register bits.
+#define IS31FL3733_LEDABM_PWM  (0x00) /// PWM control mode.
+#define IS31FL3733_LEDABM_ABM1 (0x01) /// Auto Breath Mode 1.
+#define IS31FL3733_LEDABM_ABM2 (0x02) /// Auto Breath Mode 2.
+#define IS31FL3733_LEDABM_ABM3 (0x03) /// Auto Breath Mode 3.
+
+/// CR register bits.
+#define IS31FL3733_CR_SYNC_MASTER (0x40) /// Configure as clock master device.
+#define IS31FL3733_CR_SYNC_SLAVE  (0x80) /// Configure as clock slave device.
+#define IS31FL3733_CR_OSD         (0x04) /// Open/Short detection enable bit.
+#define IS31FL3733_CR_BEN         (0x02) /// Auto breath mode enable bit.
+#define IS31FL3733_CR_SSD         (0x01) /// Software shutdown bit.
 
 /** IS31FL3733 structure.
   */
 typedef struct {
   /// Address on I2C bus.
   uint8_t address;
+  /// Global Current Control value. Iout = (840 / Rext) * (GCC / 256). Rext = 20 kOhm, typically.
+  uint8_t gcc;
   /// LED matrix brightness.
   uint8_t leds[IS31FL3733_CS * IS31FL3733_SW];
   /// Pointer to I2C write register function.
@@ -90,6 +112,12 @@ typedef struct {
   uint8_t (*pfn_i2c_read_reg) (uint8_t i2c_addr, uint8_t reg_addr, uint8_t *buffer, uint8_t count);
 } IS31FL3733;
 
+/// Select active page.
+void IS31FL3733_SelectPage (IS31FL3733 *device, uint8_t page);
+/// Write to common register.
+void IS31FL3733_WriteCommonReg (IS31FL3733 *device, uint8_t reg_addr, uint8_t reg_value);
+/// Write to paged register.
+void IS31FL3733_WritePagedReg (IS31FL3733 *device, uint16_t reg_addr, uint8_t reg_value);
 /// Init LED matrix for normal operation.
 void IS31FL3733_Init (IS31FL3733 *device);
 /// Update LED matrix with internal buffer values.
