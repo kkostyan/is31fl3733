@@ -1,4 +1,4 @@
-/** ISSI IS31FL3733 header file.
+/** ISSI IS31FL3733 Pulse Width Mode (PWM) control.
   */
 #ifndef _IS31FL3733_H_
 #define _IS31FL3733_H_
@@ -84,12 +84,6 @@
 #define IS31FL3733_ISR_SB   (0x02) /// Short Bit.
 #define IS31FL3733_ISR_OB   (0x01) /// Open Bit.
 
-/// ABM register bits.
-#define IS31FL3733_LEDABM_PWM  (0x00) /// PWM control mode.
-#define IS31FL3733_LEDABM_ABM1 (0x01) /// Auto Breath Mode 1.
-#define IS31FL3733_LEDABM_ABM2 (0x02) /// Auto Breath Mode 2.
-#define IS31FL3733_LEDABM_ABM3 (0x03) /// Auto Breath Mode 3.
-
 /// CR register bits.
 #define IS31FL3733_CR_SYNC_MASTER (0x40) /// Configure as clock master device.
 #define IS31FL3733_CR_SYNC_SLAVE  (0x80) /// Configure as clock slave device.
@@ -97,34 +91,74 @@
 #define IS31FL3733_CR_BEN         (0x02) /// Auto breath mode enable bit.
 #define IS31FL3733_CR_SSD         (0x01) /// Software shutdown bit.
 
+/// LED state enumeration.
+typedef enum {
+  IS31FL3733_LED_STATE_OFF = 0x00, ///< LED is off.
+  IS31FL3733_LED_STATE_ON  = 0x01  ///< LED is on.
+} IS31FL3733_LED_STATE;
+
+/// LED status enumeration.
+typedef enum {
+  IS31FL3733_LED_STATUS_NORMAL = 0x00, ///< Normal LED status.
+  IS31FL3733_LED_STATUS_OPEN   = 0x01, ///< LED is open.
+  IS31FL3733_LED_STATUS_SHORT  = 0x02, ///< LED is short.
+} IS31FL3733_LED_STATUS;
+
+/// Pull-Up or Pull-Down resistor value.
+typedef enum {
+  IS31FL3733_RESISTOR_OFF = 0x00, ///< No resistor.
+  IS31FL3733_RESISTOR_500 = 0x01, ///< 0.5 kOhm pull-up resistor.
+  IS31FL3733_RESISTOR_1K  = 0x02, ///< 1.0 kOhm pull-up resistor.
+  IS31FL3733_RESISTOR_2K  = 0x03, ///< 2.0 kOhm pull-up resistor.
+  IS31FL3733_RESISTOR_4K  = 0x04, ///< 4.0 kOhm pull-up resistor.
+  IS31FL3733_RESISTOR_8K  = 0x05, ///< 8.0 kOhm pull-up resistor.
+  IS31FL3733_RESISTOR_16K = 0x06, ///< 16 kOhm pull-up resistor.
+  IS31FL3733_RESISTOR_32K = 0x07  ///< 32 kOhm pull-up resistor.
+} IS31FL3733_RESISTOR;
+
 /** IS31FL3733 structure.
   */
 typedef struct {
   /// Address on I2C bus.
   uint8_t address;
-  /// Global Current Control value. Iout = (840 / Rext) * (GCC / 256). Rext = 20 kOhm, typically.
-  uint8_t gcc;
-  /// LED matrix brightness.
-  uint8_t leds[IS31FL3733_CS * IS31FL3733_SW];
+  /// State of individual LED's. Bitmask, that can't be read back from IS31FL3733.
+  uint8_t leds[IS31FL3733_CS * IS31FL3733_SW / 8];
   /// Pointer to I2C write register function.
-  uint8_t (*pfn_i2c_write_reg) (uint8_t i2c_addr, uint8_t reg_addr, uint8_t *buffer, uint8_t count);
+  uint8_t (*i2c_write_reg) (uint8_t i2c_addr, uint8_t reg_addr, uint8_t *buffer, uint8_t count);
   /// Pointer to I2C read register function.
-  uint8_t (*pfn_i2c_read_reg) (uint8_t i2c_addr, uint8_t reg_addr, uint8_t *buffer, uint8_t count);
+  uint8_t (*i2c_read_reg) (uint8_t i2c_addr, uint8_t reg_addr, uint8_t *buffer, uint8_t count);
 } IS31FL3733;
 
-/// Select active page.
-void IS31FL3733_SelectPage (IS31FL3733 *device, uint8_t page);
+/// Read from common register.
+uint8_t IS31FL3733_ReadCommonReg (IS31FL3733 *device, uint8_t reg_addr);
 /// Write to common register.
 void IS31FL3733_WriteCommonReg (IS31FL3733 *device, uint8_t reg_addr, uint8_t reg_value);
+/// Select active page.
+void IS31FL3733_SelectPage (IS31FL3733 *device, uint8_t page);
+/// Read from paged register.
+uint8_t IS31FL3733_ReadPagedReg (IS31FL3733 *device, uint16_t reg_addr);
 /// Write to paged register.
 void IS31FL3733_WritePagedReg (IS31FL3733 *device, uint16_t reg_addr, uint8_t reg_value);
-/// Init LED matrix for normal operation.
+/// Initialize IS31FL3733 for PWM operation.
 void IS31FL3733_Init (IS31FL3733 *device);
-/// Update LED matrix with internal buffer values.
-void IS31FL3733_Update (IS31FL3733 *device);
-/// Set LED brightness level.
-void IS31FL3733_SetLED (IS31FL3733 *device, uint8_t cs, uint8_t sw, uint8_t brightness);
-/// Set brightness level for all LEDs.
-void IS31FL3733_Fill   (IS31FL3733 *device, uint8_t brightness);
+/// Set global current control register.
+void IS31FL3733_SetGCC (IS31FL3733 *device, uint8_t gcc);
+/// Set SW Pull-Up register.
+void IS31FL3733_SetSWPUR (IS31FL3733 *device, IS31FL3733_RESISTOR resistor);
+/// Set CS Pull-Down register.
+void IS31FL3733_SetCSPDR (IS31FL3733 *device, IS31FL3733_RESISTOR resistor);
+/// Set LED state: ON/OFF. Could be set ALL / CS / SW.
+void IS31FL3733_SetLEDState (IS31FL3733 *device, uint8_t cs, uint8_t sw, IS31FL3733_LED_STATE state);
+/// Set LED PWM duty value. Could be set ALL / CS / SW.
+void IS31FL3733_SetLEDPWM (IS31FL3733 *device, uint8_t cs, uint8_t sw, uint8_t value);
+/// Get status of LED: Open/short.
+//IS31FL3733_LED_STATUS IS31FL3733_GetLEDStatus (IS31FL3733 *device, uint8_t cs, uint8_t sw);
+
+/// Set LED state for N LED's from buffer starting from CS and SW.
+//void IS31FL3733_SetState (IS31FL3733 *device, uint8_t *states);
+/// SET LED PWM duty for N LED's from buffer starting from CS and SW.
+//void IS31FL3733_SetPWM (IS31FL3733 *device, uint8_t *values);
+
+
 
 #endif /* _IS31FL3733_H_ */
