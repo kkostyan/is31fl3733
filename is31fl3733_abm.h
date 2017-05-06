@@ -1,13 +1,23 @@
-/** ISSI IS31FL3733 Auto Breath Mode control.
+/** ISSI IS31FL3733 Auto Breath Mode (ABM) control.
   */
 #ifndef _IS31FL3733_ABM_H_
 #define _IS31FL3733_ABM_H_
+
+#include "is31fl3733.h"
 
 /// Maximum number of ABM loop times.
 #define IS31FL3733_ABM_LOOP_TIMES_MAX (0x0FFF)
 
 /// Enter to ABM endless loop.
 #define IS31FL3733_ABM_LOOP_FOREVER (0x0000)
+
+/// LED mode enumeration.
+typedef enum {
+  IS31FL3733_LED_MODE_PWM  = 0x00, ///< PWM control mode.
+  IS31FL3733_LED_MODE_ABM1 = 0x01, ///< Auto Breath Mode 1.
+  IS31FL3733_LED_MODE_ABM2 = 0x02, ///< Auto Breath Mode 2.
+  IS31FL3733_LED_MODE_ABM3 = 0x03  ///< Auto Breath Mode 3.
+} IS31FL3733_LED_MODE;
 
 /// ABM T1 period time, ms.
 typedef enum {
@@ -109,6 +119,10 @@ typedef struct {
   uint16_t Times;
 } IS31FL3733_ABM;
 
+/// Set LED operating mode: PWM/ABM1,2,3. Could be set ALL / CS / SW.
+void IS31FL3733_SetLEDMode (IS31FL3733 *device, uint8_t cs, uint8_t sw, IS31FL3733_LED_MODE mode);
+/// Set LED operating mode for all LED's from buffer.
+void IS31FL3733_SetMode (IS31FL3733 *device, uint8_t *modes);
 /// Configure ABM Mode.
 void IS31FL3733_ConfigABM (IS31FL3733 *device, IS31FL3733_ABM_NUM n, IS31FL3733_ABM *config);
 /// Start ABM operation.
