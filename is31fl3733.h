@@ -122,7 +122,7 @@ typedef struct {
   /// Address on I2C bus.
   uint8_t address;
   /// State of individual LED's. Bitmask, that can't be read back from IS31FL3733.
-  uint8_t leds[IS31FL3733_CS * IS31FL3733_SW / 8];
+  uint8_t leds[IS31FL3733_SW * IS31FL3733_CS / 8];
   /// Pointer to I2C write register function.
   uint8_t (*i2c_write_reg) (uint8_t i2c_addr, uint8_t reg_addr, uint8_t *buffer, uint8_t count);
   /// Pointer to I2C read register function.
@@ -139,6 +139,8 @@ void IS31FL3733_SelectPage (IS31FL3733 *device, uint8_t page);
 uint8_t IS31FL3733_ReadPagedReg (IS31FL3733 *device, uint16_t reg_addr);
 /// Write to paged register.
 void IS31FL3733_WritePagedReg (IS31FL3733 *device, uint16_t reg_addr, uint8_t reg_value);
+/// Write array to sequentially allocated paged registers starting from specified address.
+void IS31FL3733_WritePagedRegs (IS31FL3733 *device, uint16_t reg_addr, uint8_t *values, uint8_t count);
 /// Initialize IS31FL3733 for PWM operation.
 void IS31FL3733_Init (IS31FL3733 *device);
 /// Set global current control register.
@@ -154,11 +156,11 @@ void IS31FL3733_SetLEDPWM (IS31FL3733 *device, uint8_t cs, uint8_t sw, uint8_t v
 /// Get status of LED: Open/short.
 //IS31FL3733_LED_STATUS IS31FL3733_GetLEDStatus (IS31FL3733 *device, uint8_t cs, uint8_t sw);
 
-/// Set LED state for N LED's from buffer starting from CS and SW.
+/// Set LED state for all LED's from buffer.
 //void IS31FL3733_SetState (IS31FL3733 *device, uint8_t *states);
-/// SET LED PWM duty for N LED's from buffer starting from CS and SW.
+/// SET LED PWM duty value for all LED's from buffer.
 //void IS31FL3733_SetPWM (IS31FL3733 *device, uint8_t *values);
 
-
+// TODO: add function to update region from {x0;y0} to {x1;y1}.
 
 #endif /* _IS31FL3733_H_ */
