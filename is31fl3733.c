@@ -49,7 +49,8 @@ IS31FL3733_WritePagedReg (IS31FL3733 *device, uint16_t reg_addr, uint8_t reg_val
   device->i2c_write_reg (device->address, IS31FL3733_GET_ADDR(reg_addr), &reg_value, sizeof(uint8_t));
 }
 
-void IS31FL3733_WritePagedRegs (IS31FL3733 *device, uint16_t reg_addr, uint8_t *values, uint8_t count)
+void
+IS31FL3733_WritePagedRegs (IS31FL3733 *device, uint16_t reg_addr, uint8_t *values, uint8_t count)
 {
   // Select registers page.
   IS31FL3733_SelectPage (device, IS31FL3733_GET_PAGE(reg_addr));
@@ -136,7 +137,7 @@ IS31FL3733_SetLEDState (IS31FL3733 *device, uint8_t cs, uint8_t sw, IS31FL3733_L
         device->leds[offset + 1] = 0xFF;
       }
       // Write updated LEDs state to device registers.
-      IS31FL3733_WritePagedRegs (device, IS31FL3733_GET_PAGE(IS31FL3733_LEDONOFF + offset), &device->leds[offset], IS31FL3733_CS / 8);
+      IS31FL3733_WritePagedRegs (device, IS31FL3733_LEDONOFF + offset, &device->leds[offset], IS31FL3733_CS / 8);
     }
   }
   else
@@ -184,7 +185,7 @@ IS31FL3733_SetLEDState (IS31FL3733 *device, uint8_t cs, uint8_t sw, IS31FL3733_L
         }
       }
       // Write updated LEDs state to device registers.
-      IS31FL3733_WritePagedRegs (device, IS31FL3733_GET_PAGE(IS31FL3733_LEDONOFF + offset), device->leds, IS31FL3733_SW * IS31FL3733_CS / 8);
+      IS31FL3733_WritePagedRegs (device, IS31FL3733_LEDONOFF, device->leds, IS31FL3733_SW * IS31FL3733_CS / 8);
     }
   }
 }
@@ -247,4 +248,42 @@ IS31FL3733_SetLEDPWM (IS31FL3733 *device, uint8_t cs, uint8_t sw, uint8_t value)
       }
     }
   }
+}
+
+void
+IS31FL3733_SetState (IS31FL3733 *device, uint8_t *states)
+{
+  uint8_t sw;
+  uint8_t cs;
+  uint8_t offset;
+  
+  // Set state of all LEDs.
+  for (sw = 0; sw < IS31FL3733_SW; sw++)
+  {
+    for (cs = 0; cs < IS31FL3733_CS; cs++)
+    {
+      // Calculate LED bit offset.
+      offset = (sw << 1) + (cs / 8);
+      // Update state of LED in internal buffer.
+      if (states[sw * IS31FL3733_CS + cs] == 0)
+      {
+        // Clear bit for selected LED.
+        device->leds[offset] &= ~(0x01 << (cs % 8));
+      }
+      else
+      {
+        // Set bit for selected LED.
+        device->leds[offset] |= 0x01 << (cs % 8);
+      }
+    }
+  }
+  // Write updated LEDs state to device registers.
+  IS31FL3733_WritePagedRegs (device, IS31FL3733_LEDONOFF, device->leds, IS31FL3733_SW * IS31FL3733_CS / 8);
+}
+
+void
+IS31FL3733_SetPWM (IS31FL3733 *device, uint8_t *values)
+{
+  // Write LED PWM values to device registers.
+  IS31FL3733_WritePagedRegs (device, IS31FL3733_LEDPWM, values, IS31FL3733_SW * IS31FL3733_CS);
 }

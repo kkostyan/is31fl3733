@@ -157,9 +157,9 @@ void IS31FL3733_SetLEDPWM (IS31FL3733 *device, uint8_t cs, uint8_t sw, uint8_t v
 //IS31FL3733_LED_STATUS IS31FL3733_GetLEDStatus (IS31FL3733 *device, uint8_t cs, uint8_t sw);
 
 /// Set LED state for all LED's from buffer.
-//void IS31FL3733_SetState (IS31FL3733 *device, uint8_t *states);
+void IS31FL3733_SetState (IS31FL3733 *device, uint8_t *states);
 /// SET LED PWM duty value for all LED's from buffer.
-//void IS31FL3733_SetPWM (IS31FL3733 *device, uint8_t *values);
+void IS31FL3733_SetPWM (IS31FL3733 *device, uint8_t *values);
 
 // TODO: add function to update region from {x0;y0} to {x1;y1}.
 
