@@ -180,8 +180,8 @@ IS31FL3733_SetLEDState (IS31FL3733 *device, uint8_t cs, uint8_t sw, IS31FL3733_L
         else
         {
           // Set all bits.
-          device->leds[(sw << 1)    ] = 0x00;
-          device->leds[(sw << 1) + 1] = 0x00;
+          device->leds[(sw << 1)    ] = 0xFF;
+          device->leds[(sw << 1) + 1] = 0xFF;
         }
       }
       // Write updated LEDs state to device registers.
