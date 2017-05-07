@@ -54,7 +54,7 @@ IS31FL3733_WritePagedRegs (IS31FL3733 *device, uint16_t reg_addr, uint8_t *value
 {
   // Select registers page.
   IS31FL3733_SelectPage (device, IS31FL3733_GET_PAGE(reg_addr));
-  // Write value to register.
+  // Write values to registers.
   device->i2c_write_reg (device->address, IS31FL3733_GET_ADDR(reg_addr), values, count);
 }
 
@@ -248,6 +248,35 @@ IS31FL3733_SetLEDPWM (IS31FL3733 *device, uint8_t cs, uint8_t sw, uint8_t value)
       }
     }
   }
+}
+
+IS31FL3733_LED_STATUS
+IS31FL3733_GetLEDStatus (IS31FL3733 *device, uint8_t cs, uint8_t sw)
+{
+  uint8_t offset;
+  
+  // Check CS and SW boundaries.
+  if ((cs < IS31FL3733_CS) && (sw < IS31FL3733_SW))
+  {
+    // Calculate LED bit offset.
+    offset = (sw << 1) + (cs / 8);
+    // Get Open status from device register.
+    if (IS31FL3733_ReadPagedReg (device, IS31FL3733_LEDOPEN + offset) & (0x01 << (cs % 8)))
+    {
+      return IS31FL3733_LED_STATUS_OPEN;
+    }
+    // Get Short status from device register.
+    if (IS31FL3733_ReadPagedReg (device, IS31FL3733_LEDSHORT + offset) & (0x01 << (cs % 8)))
+    {
+      return IS31FL3733_LED_STATUS_SHORT;
+    }
+  }
+  else
+  {
+    // Unknown status for nonexistent LED.
+    return IS31FL3733_LED_STATUS_UNKNOWN;
+  }
+  return IS31FL3733_LED_STATUS_NORMAL;
 }
 
 void
