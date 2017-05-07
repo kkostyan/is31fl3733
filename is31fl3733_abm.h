@@ -85,11 +85,11 @@ typedef enum {
   IS31FL3733_ABM_LOOP_END_T1 = 0x40  ///< Loop end at end of T1.
 } IS31FL3733_ABM_LOOP_END;
 
-/// ABM function number.
+/// ABM function number (also used as register offset).
 typedef enum {
-  IS31FL3733_ABM_NUM_1 = 0x01,
-  IS31FL3733_ABM_NUM_2 = 0x02,
-  IS31FL3733_ABM_NUM_3 = 0x04
+  IS31FL3733_ABM_NUM_1 = IS31FL3733_ABM1,
+  IS31FL3733_ABM_NUM_2 = IS31FL3733_ABM2,
+  IS31FL3733_ABM_NUM_3 = IS31FL3733_ABM3
 } IS31FL3733_ABM_NUM;
 
 /** Auto Breath Mode (ABM) configuration structure.
@@ -121,8 +121,6 @@ typedef struct {
 
 /// Set LED operating mode: PWM/ABM1,2,3. Could be set ALL / CS / SW.
 void IS31FL3733_SetLEDMode (IS31FL3733 *device, uint8_t cs, uint8_t sw, IS31FL3733_LED_MODE mode);
-/// Set LED operating mode for all LED's from buffer.
-void IS31FL3733_SetMode (IS31FL3733 *device, uint8_t *modes);
 /// Configure ABM Mode.
 void IS31FL3733_ConfigABM (IS31FL3733 *device, IS31FL3733_ABM_NUM n, IS31FL3733_ABM *config);
 /// Start ABM operation.

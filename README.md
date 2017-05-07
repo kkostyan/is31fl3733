@@ -1,8 +1,13 @@
 # IS31FL3733 C library #
 
-To work with library you need to declare an instance of IS31FL3733:
+This library support Pulse Width Mode (PWM) and Auto Breath Mode (ABM) for IS31FL3733.
+To use device in PWM mode, include `is31fl3733.h` file to your project.
+To use device in ABM mode, include `is31fl3733_abm.h` file to your project.
 
-    #include "is31fl3733.h"
+## Common steps ##
+
+To work with library in any of this modes you need to declare an instance of IS31FL3733:
+
     IS31FL3733 is31fl3733_0;
 
 Multiple instances with different I2C addresses on same or different I2C buses can be declared.
@@ -27,12 +32,17 @@ Set instance parameters and pointer to `i2c_write_reg` and `i2c_read_reg` functi
     is31fl3733_0.i2c_write_reg = &i2c_write_reg;
     is31fl3733_0.i2c_read_reg = &i2c_read_reg;
 
-Then, initialize device and try to draw something, e.g. set LED brightness at position {1;2} to maximum level:
+Initialize device:
 
     // Initialize device.
     IS31FL3733_Init (&is31fl3733_0);
     // Set Global Current Control.
     IS31FL3733_SetGCC (&is31fl3733_0, 127);
+
+## PWM mode ##
+
+Draw something in PWM mode, e.g. set LED brightness at position {1;2} to maximum level:
+
     // Set PWM value for LED at {1;2}.
     IS31FL3733_SetLEDPWM (&is31fl3733_0, 1, 2, 255);
     // Turn on LED at position {1;2}.
@@ -74,3 +84,28 @@ Also you can update all LEDs state and brightness from an array of values, e.g. 
     IS31FL3733_SetPWM (&is31fl3733_0, (uint8_t*)heart);
     // Turn on LED with non-zero brightness.
     IS31FL3733_SetState (&is31fl3733_0, (uint8_t*)heart);
+
+# ABM mode ##
+
+To draw automatically pulsed heart from PWM mode example declare an instance of IS31FL3733_ABM structure
+
+    IS31FL3733_ABM ABM1;
+
+Initialize device to ABM mode, set ABM mode parameters and start ABM mode operation:
+
+    // Turn on LEDs for heart figure.
+    IS31FL3733_SetState (&is31fl3733_0, (uint8_t*)heart);
+    // Configure all matrix LEDs to work in ABM1 mode.
+    IS31FL3733_SetLEDMode (&is31fl3733_0, IS31FL3733_CS, IS31FL3733_SW, IS31FL3733_LED_MODE_ABM1);
+    // Set ABM mode structure parameters.
+    ABM1.T1 = IS31FL3733_ABM_T1_840MS;
+    ABM1.T2 = IS31FL3733_ABM_T2_840MS;
+    ABM1.T3 = IS31FL3733_ABM_T3_840MS;
+    ABM1.T4 = IS31FL3733_ABM_T4_840MS;
+    ABM1.Tbegin = IS31FL3733_ABM_LOOP_BEGIN_T4;
+    ABM1.Tend = IS31FL3733_ABM_LOOP_END_T3;
+    ABM1.Times = IS31FL3733_ABM_LOOP_FOREVER;
+    // Write ABM structure parameters to device registers.
+    IS31FL3733_ConfigABM (&is31fl3733_0, IS31FL3733_ABM_NUM_1, &ABM1);
+    // Start ABM mode operation.
+    IS31FL3733_StartABM (&is31fl3733_0);
