@@ -99,9 +99,10 @@ typedef enum {
 
 /// LED status enumeration.
 typedef enum {
-  IS31FL3733_LED_STATUS_NORMAL = 0x00, ///< Normal LED status.
-  IS31FL3733_LED_STATUS_OPEN   = 0x01, ///< LED is open.
-  IS31FL3733_LED_STATUS_SHORT  = 0x02, ///< LED is short.
+  IS31FL3733_LED_STATUS_NORMAL  = 0x00, ///< Normal LED status.
+  IS31FL3733_LED_STATUS_OPEN    = 0x01, ///< LED is open.
+  IS31FL3733_LED_STATUS_SHORT   = 0x02, ///< LED is short.
+  IS31FL3733_LED_STATUS_UNKNOWN = 0x03  ///< Unknown LED status.
 } IS31FL3733_LED_STATUS;
 
 /// Pull-Up or Pull-Down resistor value.
@@ -153,13 +154,12 @@ void IS31FL3733_SetCSPDR (IS31FL3733 *device, IS31FL3733_RESISTOR resistor);
 void IS31FL3733_SetLEDState (IS31FL3733 *device, uint8_t cs, uint8_t sw, IS31FL3733_LED_STATE state);
 /// Set LED PWM duty value. Could be set ALL / CS / SW.
 void IS31FL3733_SetLEDPWM (IS31FL3733 *device, uint8_t cs, uint8_t sw, uint8_t value);
-/// Get status of LED: Open/short.
-//IS31FL3733_LED_STATUS IS31FL3733_GetLEDStatus (IS31FL3733 *device, uint8_t cs, uint8_t sw);
-
+/// Get status of LED.
+IS31FL3733_LED_STATUS IS31FL3733_GetLEDStatus (IS31FL3733 *device, uint8_t cs, uint8_t sw);
 /// Set LED state for all LED's from buffer.
-//void IS31FL3733_SetState (IS31FL3733 *device, uint8_t *states);
+void IS31FL3733_SetState (IS31FL3733 *device, uint8_t *states);
 /// SET LED PWM duty value for all LED's from buffer.
-//void IS31FL3733_SetPWM (IS31FL3733 *device, uint8_t *values);
+void IS31FL3733_SetPWM (IS31FL3733 *device, uint8_t *values);
 
 // TODO: add function to update region from {x0;y0} to {x1;y1}.
 
