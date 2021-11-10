@@ -1,0 +1,24 @@
+{
+  "name": "IS31fl3733",
+  "version": "1.0.0",
+  "description": "Provides methods to control the ISSI IS31fl3733 12x16 LED matrix driver chip.",
+  "keywords": "IS31fl3733, ISSI, LED matrix",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/neilenns/is31fl3733"
+  },
+  "authors": [
+    {
+      "name": "Neil Enns",
+      "email": "neile@live.com",
+      "url": "https://www.linkedin.com/in/neilenns/",
+      "maintainer": true
+    }
+  ],
+  "homepage": "https://github.com/neilenns/is31fl3773",
+  "frameworks": "*",
+  "platforms": "*",
+  "export": {
+    "include": ["src/*.c", "include/*.h"]
+  }
+}
